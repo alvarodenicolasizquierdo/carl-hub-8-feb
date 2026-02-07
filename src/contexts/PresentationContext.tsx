@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
 
 interface PresentationContextType {
   isPresenting: boolean;
@@ -33,6 +33,17 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
       }
       return !prev;
     });
+  }, []);
+
+  // Sync: if user exits fullscreen natively (browser Escape), stop presenting
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        setIsPresenting(false);
+      }
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
   return (
