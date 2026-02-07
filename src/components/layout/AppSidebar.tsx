@@ -9,8 +9,10 @@ import {
   Settings,
   PanelLeftClose,
   PanelLeft,
+  Presentation,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePresentation } from "@/contexts/PresentationContext";
 import sgsLogo from "@/assets/sgs-logo.png";
 
 const NAV_ITEMS = [
@@ -24,6 +26,7 @@ const NAV_ITEMS = [
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const { startPresentation } = usePresentation();
 
   return (
     <aside
@@ -64,8 +67,17 @@ export function AppSidebar() {
         })}
       </nav>
 
-      {/* Bottom: Settings + Collapse */}
+      {/* Bottom: Present + Settings + Collapse */}
       <div className="px-2 pb-4 flex flex-col gap-1">
+        {/* Present button */}
+        <button
+          onClick={startPresentation}
+          className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 transition-colors"
+        >
+          <Presentation className="w-5 h-5 shrink-0" />
+          {!collapsed && <span>Present</span>}
+        </button>
+
         <NavLink
           to="/settings"
           className={cn(
