@@ -1,27 +1,63 @@
 
 
-# Add Smallest (40px) Primary SGS Logo
+# Build Competitive Comparison Table Page
 
-## What's Changing
+## Overview
 
-Add the 40px primary SGS logo (full logo with "SGS" text and cross mark) to the project assets. This gives you three logo variants to use across the app:
+Replace the placeholder Compare page with a full-featured comparison table, inspired by the Dub, Monday.com, Loom, and Better Stack patterns from the reference screenshots. The page will compare CARLOS against its two main competitors (Inspectorio and TradeBeyond) already referenced on the Index page.
 
-| Asset | Size | Content | Current Use |
-|-------|------|---------|-------------|
-| `sgs-logo.png` (80px secondary) | 80px | Cross mark only | Sidebar |
-| `sgs-logo-tagline.png` (80px secondary) | 80px | Cross mark + tagline | Landing hero |
-| `sgs-logo-primary.png` (40px primary) | 40px | Full logo with "SGS" text | **New — not yet used** |
-| `sgs-logo-tagline-sm.png` (40px primary) | 40px | Full logo + tagline | **New — not yet used** |
+## Layout
 
-## Steps
+- Hero section with headline: "How CARLOS measures up" and a subtitle
+- A clean comparison table with three columns: Feature | CARLOS | Inspectorio | TradeBeyond (or allow toggling between competitors like Monday.com does)
+- CARLOS column highlighted with a branded border/background (like Dub and Loom highlight themselves)
+- Feature rows using check/cross icons for boolean features and text values for descriptive ones
+- Alternating row backgrounds for readability (like Whereby)
+- Optional: a side panel with 2-3 key differentiator callout cards (like Customer.io's "Get started for free / Built to scale" cards)
 
-1. Copy the two 40px PNG logos into `src/assets/`:
-   - `SGS_logo-digital_40px.png` -> `src/assets/sgs-logo-primary.png`
-   - `SGS_logo-tagline_digital_40px.png` -> `src/assets/sgs-logo-tagline-sm.png`
+## Comparison Categories and Features
 
-2. **Optionally swap the sidebar logo** to use the 40px primary (which includes "SGS" text), so the sidebar shows the full brand mark even when collapsed — removing the need for the separate "CARLOS" text label. This would make the collapsed sidebar cleaner since the logo itself contains "SGS".
+Based on the existing competitive positioning on Index.tsx (the "Why CARLOS?" section), the table would cover areas like:
 
-## Technical Notes
-- PNG format, transparent background, works on dark and light
-- The 40px versions are optimized for small display sizes and will render crisply in the sidebar
+| Feature | CARLOS | Inspectorio | TradeBeyond |
+|---------|--------|-------------|-------------|
+| AI Explainability | Full reasoning transparency | Black-box AI | No AI |
+| Sustainability / DPP | EU DPP 2027 ready | Limited | Basic reporting |
+| Scheme-Agnostic Compliance | Yes | Single-scheme | Partial |
+| ML Features | 847 | Unknown | N/A |
+| Real Production Data Validation | Yes | No | No |
+| Care Labelling AI | Yes | No | No |
+| Risk Assessment Map | Yes | No | No |
+| Role-Adaptive Views | Yes | No | No |
+| Projected ROI | 7.7x | Not published | Not published |
+
+(The actual data can be refined -- this is a starting structure.)
+
+## Technical Approach
+
+1. Create a new `src/pages/Compare.tsx` with:
+   - A `competitors` data array (name, features map)
+   - A `features` data array (label, description, category)
+   - Reuse the existing `Table`, `TableHeader`, `TableBody`, `TableRow`, `TableHead`, `TableCell` components from `src/components/ui/table.tsx`
+   - Use `lucide-react` `Check` and `X` icons styled green/red for boolean comparisons
+   - Highlight the CARLOS column with a subtle `border-primary` or `bg-primary/5`
+
+2. Optional tab bar at the top to filter by category (e.g., "AI", "Sustainability", "Core Platform") using the existing `Tabs` component
+
+3. Responsive -- stacks on mobile with CARLOS column always visible
+
+## Design Details
+
+- Font: `font-display` (Space Grotesk) for headings, `font-sans` (Inter) for body
+- CARLOS column header uses the SGS orange brand colour with a subtle highlight
+- Competitor columns use neutral/muted styling
+- Check icons: `text-accent-green`, X icons: `text-destructive/60`
+- Alternating row backgrounds using `bg-muted/30`
+- Sticky header row for scrollability
+
+## Files Changed
+
+- `src/pages/Compare.tsx` -- full rewrite from placeholder to comparison table page
+
+No new dependencies required. Uses existing UI components (Table, Tabs, Card) and lucide-react icons.
 
