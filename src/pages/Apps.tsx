@@ -1,9 +1,255 @@
+import { motion } from "framer-motion";
+import {
+  Shield,
+  Brain,
+  Leaf,
+  Map,
+  ExternalLink,
+  Sparkles,
+  FileCheck,
+  Layers,
+  Globe,
+  Users,
+  Database,
+} from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { APPS, getAppUrl } from "@/config/constants";
+
+const ICON_MAP: Record<string, React.ElementType> = {
+  Shield,
+  Brain,
+  Leaf,
+  Map,
+};
+
+const FEATURES = [
+  {
+    icon: Sparkles,
+    title: "Explainable AI",
+    description: "Every decision shows its reasoning chain — no black boxes.",
+  },
+  {
+    icon: FileCheck,
+    title: "DPP-Ready",
+    description: "EU Digital Product Passport export built in from day one.",
+  },
+  {
+    icon: Layers,
+    title: "Scheme-Agnostic",
+    description: "Works across BSCI, Higg, SLCP, and custom schemes.",
+  },
+  {
+    icon: Globe,
+    title: "Real-Time Risk",
+    description: "Live risk scoring across 14,000+ suppliers worldwide.",
+  },
+  {
+    icon: Users,
+    title: "Role-Adaptive Views",
+    description: "UI adapts to buyer, auditor, or executive automatically.",
+  },
+  {
+    icon: Database,
+    title: "Production-Validated",
+    description: "Built on 63 tables, 847 ML features from real data.",
+  },
+];
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.08, duration: 0.5, ease: "easeOut" as const },
+  }),
+};
+
 const AppsPage = () => (
-  <div className="flex items-center justify-center min-h-[60vh]">
-    <div className="text-center">
-      <h1 className="text-3xl font-display font-bold mb-2">App Explorer</h1>
-      <p className="text-muted-foreground">Coming in Phase 3</p>
-    </div>
+  <div className="min-h-screen">
+    {/* ── Hero ── */}
+    <section className="relative overflow-hidden bg-sgs-dark py-20 text-center">
+      <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent" />
+      <div className="relative mx-auto max-w-3xl px-6">
+        <motion.h1
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="font-display text-4xl font-bold tracking-tight text-primary-foreground md:text-5xl"
+        >
+          Explore the CARLOS Suite
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="mt-4 text-lg text-muted-foreground"
+        >
+          Four apps. One platform. Purpose-built for retail quality
+          intelligence.
+        </motion.p>
+      </div>
+    </section>
+
+    {/* ── App Cards Grid ── */}
+    <section className="mx-auto max-w-6xl px-6 py-16">
+      <div className="grid gap-6 sm:grid-cols-2">
+        {APPS.map((app, i) => {
+          const Icon = ICON_MAP[app.icon];
+          const baseUrl = getAppUrl(app.id);
+          return (
+            <motion.div
+              key={app.id}
+              custom={i}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-40px" }}
+              variants={fadeUp}
+            >
+              <Card
+                className={`h-full border-l-4 ${app.borderClass} bg-card transition-shadow hover:shadow-lg`}
+              >
+                <CardContent className="flex flex-col gap-4 p-6">
+                  {/* Header */}
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`flex h-10 w-10 items-center justify-center rounded-lg ${app.bgClass}`}
+                    >
+                      <Icon className={`h-5 w-5 ${app.colorClass}`} />
+                    </div>
+                    <h2 className="font-display text-xl font-semibold">
+                      {app.name}
+                    </h2>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {app.description}
+                  </p>
+
+                  {/* Stats */}
+                  <div className="flex gap-4 text-xs text-muted-foreground">
+                    <span>{app.stats.screens} screens</span>
+                    <span className="text-border">|</span>
+                    <span>{app.stats.components} components</span>
+                    <span className="text-border">|</span>
+                    <span>{app.stats.ai} AI features</span>
+                  </div>
+
+                  {/* Best for */}
+                  <p className="text-xs italic text-muted-foreground">
+                    Best for: {app.bestFor}
+                  </p>
+
+                  {/* Route pills */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {app.keyRoutes.map((r) => (
+                      <a
+                        key={r.label}
+                        href={`${baseUrl}${r.route}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Badge
+                          variant="secondary"
+                          className="cursor-pointer text-[11px] hover:bg-muted"
+                        >
+                          {r.label}
+                        </Badge>
+                      </a>
+                    ))}
+                  </div>
+
+                  {/* Launch */}
+                  <Button
+                    asChild
+                    size="sm"
+                    className="mt-auto w-full gap-1.5"
+                  >
+                    <a
+                      href={baseUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Launch App
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          );
+        })}
+      </div>
+    </section>
+
+    {/* ── Feature Highlights ── */}
+    <section className="bg-sgs-dark py-16">
+      <div className="mx-auto max-w-6xl px-6">
+        <h2 className="mb-10 text-center font-display text-2xl font-bold text-primary-foreground md:text-3xl">
+          Platform Capabilities
+        </h2>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {FEATURES.map((f, i) => (
+            <motion.div
+              key={f.title}
+              custom={i}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-40px" }}
+              variants={fadeUp}
+            >
+              <Card className="h-full bg-card/60 backdrop-blur-sm border-border/40">
+                <CardContent className="flex gap-4 p-5">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10">
+                    <f.icon className="h-4.5 w-4.5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-display text-sm font-semibold">
+                      {f.title}
+                    </h3>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                      {f.description}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* ── Quick Launch Bar ── */}
+    <section className="mx-auto max-w-4xl px-6 py-12">
+      <h3 className="mb-4 text-center font-display text-lg font-semibold text-muted-foreground">
+        Quick Launch
+      </h3>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {APPS.map((app) => {
+          const Icon = ICON_MAP[app.icon];
+          return (
+            <Button
+              key={app.id}
+              variant="outline"
+              asChild
+              className={`justify-start gap-2 border-l-4 ${app.borderClass}`}
+            >
+              <a
+                href={getAppUrl(app.id)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Icon className={`h-4 w-4 ${app.colorClass}`} />
+                <span className="truncate text-xs">{app.name}</span>
+              </a>
+            </Button>
+          );
+        })}
+      </div>
+    </section>
   </div>
 );
+
 export default AppsPage;
