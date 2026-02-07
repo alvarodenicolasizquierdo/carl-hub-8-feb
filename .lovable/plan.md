@@ -1,71 +1,64 @@
 
 
-# Enhance Comparison Table -- Inspired by Reference Screenshots
+# Upgrade Presentation Mode -- Figma Slides-Inspired Controls
+
+## Overview
+
+Enhance the existing presentation mode with features inspired by Figma Slides: keyboard navigation, a slide counter, auto-hiding controls, and a more polished floating toolbar. The current implementation works but feels basic -- this upgrade makes it feel like a real presentation tool for the Shanghai workshop.
 
 ## What Changes
 
-Upgrade the existing Compare page with design patterns from Slite, Deel, Height, Ghost, Klaviyo, and others to make it more visually compelling and informative.
+### 1. Keyboard Navigation
 
-### 1. Category Section Headers Within the Table (from Height, Deel)
+Add global keyboard event listeners when presenting:
+- **Left Arrow / Up Arrow**: go to previous slide
+- **Right Arrow / Down Arrow / Space**: go to next slide
+- **Escape**: exit presentation mode
 
-Instead of only using tabs to filter categories, show **all features at once** by default with bold category divider rows inline in the table (e.g., a full-width row reading "AI and ML" in bold before those features). The tabs still work as filters, but "All Features" shows grouped sections.
+This is the single most important upgrade -- presenters expect arrow keys to work without thinking.
 
-### 2. Richer Text Values with Inline Icons (from Ghost, Buy Me a Coffee)
+### 2. Auto-Hiding Controls
 
-For text-based values, prepend a small check or X icon next to the text (like Ghost does with emoji). This makes it instantly scannable -- green check + "2027-ready" vs red X + "Basic reporting". Currently text values have no icon.
+The floating bottom bar currently stays visible at all times. Upgrade to:
+- Controls fade out after 3 seconds of no mouse movement
+- Moving the mouse brings them back instantly
+- This maximises screen real estate during the actual presentation
 
-### 3. Competitor Caveat Text in Muted Italic (from Klaviyo)
+### 3. Slide Counter
 
-Where competitors have a negative note, show a short italic caveat line below the value in `text-destructive` (e.g., under Inspectorio's "Black-box AI" add *"No reasoning provided"*). This adds persuasive detail without cluttering.
+Add a "1 / 5" counter between the nav arrows (like Figma's "1 / 43" at the bottom). Quick glance tells the presenter where they are in the deck.
 
-### 4. Column Highlight with Rounded Border (from Wave, Quicken)
+### 4. Fullscreen-Exit Sync
 
-Instead of just `bg-primary/5`, add a subtle `ring-1 ring-primary/20 rounded-lg` visual treatment to the entire CARLOS column area, making it pop more like the Wave and Quicken examples.
+Listen for the browser `fullscreenchange` event so that if the presenter presses the native Escape key (which exits fullscreen), the presentation state also stops cleanly. Currently exiting fullscreen via the browser leaves `isPresenting` as true.
 
-### 5. More Feature Rows
+### 5. Progress Bar
 
-Expand from 9 to ~14 features to make the table feel more comprehensive and authoritative. Add features like:
-- Predictive Quality Analytics (AI)
-- Multi-language Support (Platform)
-- Offline Inspection Capability (Platform)
-- Carbon Footprint Tracking (Sustainability)
-- Supply Chain Traceability (Sustainability)
-
-### 6. Summary Row at Bottom (from Amplitude mirror pattern)
-
-Add a footer/summary row showing a simple win count: "CARLOS leads in X of Y features" with a subtle background.
+Add a thin progress bar at the very top of the screen showing how far through the deck you are (e.g., slide 3/5 = 60% width). Subtle but useful for pacing.
 
 ## Technical Details
 
-### File changed
-- `src/pages/Compare.tsx` -- enhanced with all the above
+### Files Changed
 
-### Data structure update
-```
-interface Feature {
-  label: string;
-  description?: string;
-  category: "ai" | "sustainability" | "platform";
-  carlos: FeatureValue;
-  carlosCaveat?: string;       // optional positive note
-  inspectorio: FeatureValue;
-  inspectorioCaveat?: string;  // optional negative caveat
-  tradebeyond: FeatureValue;
-  tradebeyondCaveat?: string;  // optional negative caveat
-}
-```
+**`src/contexts/PresentationContext.tsx`**
+- Add `fullscreenchange` event listener to sync state when browser exits fullscreen natively
+- No new state needed, just a `useEffect` in the provider
 
-### ValueCell update
-- Boolean `true` renders: green Check icon
-- Boolean `false` renders: red X icon
-- String values: prepend a small green Check (for CARLOS) or contextual icon, then the text
-- If a caveat string exists, render it below in `text-xs italic text-destructive` (for competitors) or `text-xs italic text-primary` (for CARLOS)
+**`src/components/layout/PresentationControls.tsx`**
+- Add `useEffect` for keyboard event listeners (ArrowLeft, ArrowRight, Space, Escape)
+- Add mouse idle timer: track `mousemove` with `setTimeout` to toggle a `visible` state after 3s
+- Add slide counter text: `{currentIndex + 1} / {SLIDES.length}` between the arrows
+- Add a thin fixed progress bar at the top: `<div className="fixed top-0 left-0 h-0.5 bg-primary z-50" style={{ width: percentage }} />`
+- Wrap the toolbar in opacity transition tied to the idle timer
 
-### Category section headers
-When `category === "all"`, insert a full-colspan `TableRow` before each category group with the category name styled as a bold section header (like Height's "Personal views" / "Integrations" dividers).
+### No New Files or Dependencies
 
-### Summary footer
-A `TableFooter` row spanning all columns showing "CARLOS leads in X of Y categories" with a subtle `bg-primary/5` background.
+Everything uses existing framer-motion, lucide-react, and Tailwind utilities. No new packages needed.
 
-### No new dependencies
-Uses existing Table, Tabs, Card, Badge components and lucide-react icons.
+## Design Details
+
+- Progress bar: `h-0.5 bg-primary` fixed to top, transitions width smoothly with `transition-all duration-500`
+- Slide counter: `text-xs text-muted-foreground tabular-nums` for fixed-width digits
+- Auto-hide: toolbar fades to `opacity-0` after 3s idle, `opacity-100` on mouse move, with `pointer-events-none` when hidden
+- Keyboard handlers only active when `isPresenting` is true, cleaned up on unmount
+
