@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCountUp } from "@/hooks/use-count-up";
 import { APPS, WOW_MOMENTS, getAppUrl, APP_URLS } from "@/config/constants";
+import sgsLogoTagline from "@/assets/sgs-logo-tagline.png";
 
 const STAT_ICONS: Record<string, React.ElementType> = { Layers, Monitor, Brain, Blocks, Globe, TrendingUp };
 const APP_ICONS: Record<string, React.ElementType> = { Shield, Brain, Leaf, Map };
@@ -112,9 +113,7 @@ export default function Index() {
             Prototype — Design Vision
           </p>
 
-          <div className="w-16 h-16 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-display font-bold text-xl mx-auto mb-6">
-            SGS
-          </div>
+          <img src={sgsLogoTagline} alt="SGS — When you need to be sure" className="h-20 w-auto mx-auto mb-6" />
 
           <h1 className="text-7xl font-display font-bold text-foreground mb-4">CARLOS</h1>
           <p className="text-xl text-foreground/80 mb-2">

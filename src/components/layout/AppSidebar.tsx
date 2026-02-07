@@ -11,6 +11,7 @@ import {
   PanelLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import sgsLogo from "@/assets/sgs-logo.png";
 
 const NAV_ITEMS = [
   { label: "Home", icon: Home, path: "/" },
@@ -33,9 +34,7 @@ export function AppSidebar() {
     >
       {/* Logo */}
       <div className="h-16 flex items-center gap-2 px-4 border-b border-border/20">
-        <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-display font-bold text-sm shrink-0">
-          SGS
-        </div>
+        <img src={sgsLogo} alt="SGS" className="h-8 w-auto shrink-0" />
         {!collapsed && (
           <span className="font-display font-semibold text-foreground tracking-tight">
             CARLOS
