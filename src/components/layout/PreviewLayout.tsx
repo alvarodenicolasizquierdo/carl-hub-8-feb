@@ -1,4 +1,5 @@
-import { Outlet, NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
+import { AnimatedOutlet } from "./AnimatedOutlet";
 import {
   Home,
   Play,
@@ -55,7 +56,7 @@ export function PreviewLayout() {
 
       {/* Content */}
       <main className="flex-1">
-        <Outlet />
+        <AnimatedOutlet />
       </main>
 
       <Footer />
