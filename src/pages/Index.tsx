@@ -172,7 +172,7 @@ export default function Index() {
             Built on Real Production Data
           </h2>
           <p className="text-muted-foreground mb-12">
-            Validated against Sainsbury's UKI portfolio — 63 tables, 847 ML features, 14,000+ suppliers
+            Validated against a large, long-standing Tier 1 retail customer — 63 tables, 847 ML features, 14,000+ suppliers
           </p>
           <div className="grid grid-cols-4 gap-8">
             <DataMetric value="847" label="ML Features Mapped" end={847} />
