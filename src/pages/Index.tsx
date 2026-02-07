@@ -113,7 +113,7 @@ export default function Index() {
             Prototype — Design Vision
           </p>
 
-          <img src={sgsLogoTagline} alt="SGS — When you need to be sure" className="h-20 w-auto mx-auto mb-6" />
+          <img src={sgsLogoTagline} alt="SGS — When you need to be sure" width={135} height={80} className="h-20 w-auto mx-auto mb-6" />
 
           <h1 className="text-7xl font-display font-bold text-foreground mb-4">CARLOS</h1>
           <p className="text-xl text-foreground/80 mb-2">
