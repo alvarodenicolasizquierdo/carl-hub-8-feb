@@ -1,63 +1,71 @@
 
 
-# Build Competitive Comparison Table Page
+# Enhance Comparison Table -- Inspired by Reference Screenshots
 
-## Overview
+## What Changes
 
-Replace the placeholder Compare page with a full-featured comparison table, inspired by the Dub, Monday.com, Loom, and Better Stack patterns from the reference screenshots. The page will compare CARLOS against its two main competitors (Inspectorio and TradeBeyond) already referenced on the Index page.
+Upgrade the existing Compare page with design patterns from Slite, Deel, Height, Ghost, Klaviyo, and others to make it more visually compelling and informative.
 
-## Layout
+### 1. Category Section Headers Within the Table (from Height, Deel)
 
-- Hero section with headline: "How CARLOS measures up" and a subtitle
-- A clean comparison table with three columns: Feature | CARLOS | Inspectorio | TradeBeyond (or allow toggling between competitors like Monday.com does)
-- CARLOS column highlighted with a branded border/background (like Dub and Loom highlight themselves)
-- Feature rows using check/cross icons for boolean features and text values for descriptive ones
-- Alternating row backgrounds for readability (like Whereby)
-- Optional: a side panel with 2-3 key differentiator callout cards (like Customer.io's "Get started for free / Built to scale" cards)
+Instead of only using tabs to filter categories, show **all features at once** by default with bold category divider rows inline in the table (e.g., a full-width row reading "AI and ML" in bold before those features). The tabs still work as filters, but "All Features" shows grouped sections.
 
-## Comparison Categories and Features
+### 2. Richer Text Values with Inline Icons (from Ghost, Buy Me a Coffee)
 
-Based on the existing competitive positioning on Index.tsx (the "Why CARLOS?" section), the table would cover areas like:
+For text-based values, prepend a small check or X icon next to the text (like Ghost does with emoji). This makes it instantly scannable -- green check + "2027-ready" vs red X + "Basic reporting". Currently text values have no icon.
 
-| Feature | CARLOS | Inspectorio | TradeBeyond |
-|---------|--------|-------------|-------------|
-| AI Explainability | Full reasoning transparency | Black-box AI | No AI |
-| Sustainability / DPP | EU DPP 2027 ready | Limited | Basic reporting |
-| Scheme-Agnostic Compliance | Yes | Single-scheme | Partial |
-| ML Features | 847 | Unknown | N/A |
-| Real Production Data Validation | Yes | No | No |
-| Care Labelling AI | Yes | No | No |
-| Risk Assessment Map | Yes | No | No |
-| Role-Adaptive Views | Yes | No | No |
-| Projected ROI | 7.7x | Not published | Not published |
+### 3. Competitor Caveat Text in Muted Italic (from Klaviyo)
 
-(The actual data can be refined -- this is a starting structure.)
+Where competitors have a negative note, show a short italic caveat line below the value in `text-destructive` (e.g., under Inspectorio's "Black-box AI" add *"No reasoning provided"*). This adds persuasive detail without cluttering.
 
-## Technical Approach
+### 4. Column Highlight with Rounded Border (from Wave, Quicken)
 
-1. Create a new `src/pages/Compare.tsx` with:
-   - A `competitors` data array (name, features map)
-   - A `features` data array (label, description, category)
-   - Reuse the existing `Table`, `TableHeader`, `TableBody`, `TableRow`, `TableHead`, `TableCell` components from `src/components/ui/table.tsx`
-   - Use `lucide-react` `Check` and `X` icons styled green/red for boolean comparisons
-   - Highlight the CARLOS column with a subtle `border-primary` or `bg-primary/5`
+Instead of just `bg-primary/5`, add a subtle `ring-1 ring-primary/20 rounded-lg` visual treatment to the entire CARLOS column area, making it pop more like the Wave and Quicken examples.
 
-2. Optional tab bar at the top to filter by category (e.g., "AI", "Sustainability", "Core Platform") using the existing `Tabs` component
+### 5. More Feature Rows
 
-3. Responsive -- stacks on mobile with CARLOS column always visible
+Expand from 9 to ~14 features to make the table feel more comprehensive and authoritative. Add features like:
+- Predictive Quality Analytics (AI)
+- Multi-language Support (Platform)
+- Offline Inspection Capability (Platform)
+- Carbon Footprint Tracking (Sustainability)
+- Supply Chain Traceability (Sustainability)
 
-## Design Details
+### 6. Summary Row at Bottom (from Amplitude mirror pattern)
 
-- Font: `font-display` (Space Grotesk) for headings, `font-sans` (Inter) for body
-- CARLOS column header uses the SGS orange brand colour with a subtle highlight
-- Competitor columns use neutral/muted styling
-- Check icons: `text-accent-green`, X icons: `text-destructive/60`
-- Alternating row backgrounds using `bg-muted/30`
-- Sticky header row for scrollability
+Add a footer/summary row showing a simple win count: "CARLOS leads in X of Y features" with a subtle background.
 
-## Files Changed
+## Technical Details
 
-- `src/pages/Compare.tsx` -- full rewrite from placeholder to comparison table page
+### File changed
+- `src/pages/Compare.tsx` -- enhanced with all the above
 
-No new dependencies required. Uses existing UI components (Table, Tabs, Card) and lucide-react icons.
+### Data structure update
+```
+interface Feature {
+  label: string;
+  description?: string;
+  category: "ai" | "sustainability" | "platform";
+  carlos: FeatureValue;
+  carlosCaveat?: string;       // optional positive note
+  inspectorio: FeatureValue;
+  inspectorioCaveat?: string;  // optional negative caveat
+  tradebeyond: FeatureValue;
+  tradebeyondCaveat?: string;  // optional negative caveat
+}
+```
 
+### ValueCell update
+- Boolean `true` renders: green Check icon
+- Boolean `false` renders: red X icon
+- String values: prepend a small green Check (for CARLOS) or contextual icon, then the text
+- If a caveat string exists, render it below in `text-xs italic text-destructive` (for competitors) or `text-xs italic text-primary` (for CARLOS)
+
+### Category section headers
+When `category === "all"`, insert a full-colspan `TableRow` before each category group with the category name styled as a bold section header (like Height's "Personal views" / "Integrations" dividers).
+
+### Summary footer
+A `TableFooter` row spanning all columns showing "CARLOS leads in X of Y categories" with a subtle `bg-primary/5` background.
+
+### No new dependencies
+Uses existing Table, Tabs, Card, Badge components and lucide-react icons.
