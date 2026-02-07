@@ -110,10 +110,25 @@ export const STORAGE_KEYS = {
   theme: "carlos_theme",
 } as const;
 
+const ALLOWED_DOMAINS = [".lovable.app", ".lovable.dev"];
+
 export function getAppUrl(appId: string): string {
   try {
-    const overrides = JSON.parse(localStorage.getItem(STORAGE_KEYS.appUrls) || "{}");
-    return overrides[appId] || APP_URLS[appId] || "";
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEYS.appUrls) || "{}");
+    if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
+      return APP_URLS[appId] || "";
+    }
+    const override = raw[appId];
+    if (typeof override !== "string") {
+      return APP_URLS[appId] || "";
+    }
+    // Validate URL format and restrict to trusted domains
+    const url = new URL(override);
+    const isTrusted = ALLOWED_DOMAINS.some((d) => url.hostname.endsWith(d));
+    if (!isTrusted || !["https:", "http:"].includes(url.protocol)) {
+      return APP_URLS[appId] || "";
+    }
+    return override;
   } catch {
     return APP_URLS[appId] || "";
   }
