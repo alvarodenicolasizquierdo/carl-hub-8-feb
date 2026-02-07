@@ -1,149 +1,46 @@
-import { useState } from "react";
-import { Check, X, Minus, Crown } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Check, X, Crown, Trophy } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableHeader,
   TableBody,
+  TableFooter,
   TableRow,
   TableHead,
   TableCell,
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import CompareValueCell from "@/components/compare/CompareValueCell";
+import { FEATURES, CATEGORIES, type CategoryId } from "@/components/compare/compareData";
 
-// ---------- data ----------
-
-type FeatureValue = boolean | string;
-
-interface Feature {
-  label: string;
-  description?: string;
-  category: "ai" | "sustainability" | "platform";
-  carlos: FeatureValue;
-  inspectorio: FeatureValue;
-  tradebeyond: FeatureValue;
-}
-
-const CATEGORIES = [
-  { id: "all", label: "All Features" },
-  { id: "ai", label: "AI & ML" },
-  { id: "sustainability", label: "Sustainability" },
-  { id: "platform", label: "Core Platform" },
-] as const;
-
-const FEATURES: Feature[] = [
-  {
-    label: "AI Explainability",
-    description: "Transparent reasoning for every decision",
-    category: "ai",
-    carlos: "Full reasoning transparency",
-    inspectorio: "Black-box AI",
-    tradebeyond: "No AI",
-  },
-  {
-    label: "ML Features",
-    description: "Number of machine-learning driven data points",
-    category: "ai",
-    carlos: "847",
-    inspectorio: "Unknown",
-    tradebeyond: "N/A",
-  },
-  {
-    label: "Care Labelling AI",
-    description: "AI-powered care label generation",
-    category: "ai",
-    carlos: true,
-    inspectorio: false,
-    tradebeyond: false,
-  },
-  {
-    label: "Risk Assessment Map",
-    description: "Visual risk mapping across supply chain",
-    category: "ai",
-    carlos: true,
-    inspectorio: false,
-    tradebeyond: false,
-  },
-  {
-    label: "EU Digital Product Passport",
-    description: "Ready for 2027 DPP regulation",
-    category: "sustainability",
-    carlos: "2027-ready",
-    inspectorio: "Limited",
-    tradebeyond: "Basic reporting",
-  },
-  {
-    label: "Real Production Data Validation",
-    description: "Validate against actual production data",
-    category: "sustainability",
-    carlos: true,
-    inspectorio: false,
-    tradebeyond: false,
-  },
-  {
-    label: "Scheme-Agnostic Compliance",
-    description: "Works across all compliance schemes",
-    category: "platform",
-    carlos: true,
-    inspectorio: "Single-scheme",
-    tradebeyond: "Partial",
-  },
-  {
-    label: "Role-Adaptive Views",
-    description: "Interface adapts to user role",
-    category: "platform",
-    carlos: true,
-    inspectorio: false,
-    tradebeyond: false,
-  },
-  {
-    label: "Projected ROI",
-    description: "Return on investment for enterprise clients",
-    category: "platform",
-    carlos: "7.7×",
-    inspectorio: "Not published",
-    tradebeyond: "Not published",
-  },
-];
-
-// ---------- helpers ----------
-
-function ValueCell({ value, isCarlos }: { value: FeatureValue; isCarlos?: boolean }) {
-  if (typeof value === "boolean") {
-    return value ? (
-      <Check className="h-5 w-5 text-accent-green mx-auto" />
-    ) : (
-      <X className="h-5 w-5 text-destructive/60 mx-auto" />
-    );
-  }
-
-  // text values
-  const isNegative = ["No AI", "N/A", "Unknown", "Not published", "Black-box AI"].includes(value);
-  return (
-    <span
-      className={
-        isCarlos
-          ? "font-semibold text-foreground"
-          : isNegative
-            ? "text-muted-foreground"
-            : "text-foreground"
-      }
-    >
-      {value}
-    </span>
-  );
-}
-
-// ---------- component ----------
+const CATEGORY_LABELS: Record<string, string> = {
+  ai: "AI & Machine Learning",
+  sustainability: "Sustainability & Compliance",
+  platform: "Core Platform",
+};
 
 const ComparePage = () => {
   const [category, setCategory] = useState<string>("all");
 
-  const filtered =
-    category === "all"
-      ? FEATURES
-      : FEATURES.filter((f) => f.category === category);
+  const grouped = useMemo(() => {
+    if (category !== "all") {
+      return [{ category: category as CategoryId, features: FEATURES.filter((f) => f.category === category) }];
+    }
+    const order: CategoryId[] = ["ai", "sustainability", "platform"];
+    return order.map((cat) => ({
+      category: cat,
+      features: FEATURES.filter((f) => f.category === cat),
+    }));
+  }, [category]);
+
+  // Win count: features where CARLOS is true or a non-negative string
+  const totalFeatures = FEATURES.length;
+  const carlosWins = FEATURES.filter((f) => {
+    if (typeof f.carlos === "boolean") return f.carlos;
+    return !["No AI", "N/A", "Unknown", "Not published"].includes(f.carlos);
+  }).length;
 
   return (
     <div className="px-4 py-12 sm:px-6 lg:px-10 max-w-6xl mx-auto space-y-10">
@@ -182,7 +79,7 @@ const ComparePage = () => {
                 <TableHead className="w-[260px] text-foreground font-display text-sm">
                   Feature
                 </TableHead>
-                <TableHead className="text-center bg-primary/5 border-x border-primary/10">
+                <TableHead className="text-center bg-primary/5 border-x border-primary/20 ring-1 ring-primary/10 rounded-t-lg">
                   <div className="flex items-center justify-center gap-1.5 font-display text-primary font-bold">
                     <Crown className="h-4 w-4" />
                     CARLOS
@@ -198,35 +95,61 @@ const ComparePage = () => {
             </TableHeader>
 
             <TableBody>
-              {filtered.map((feature, i) => (
-                <TableRow
-                  key={feature.label}
-                  className={i % 2 === 1 ? "bg-muted/30" : ""}
-                >
-                  <TableCell>
-                    <div>
-                      <span className="font-medium text-foreground">
-                        {feature.label}
-                      </span>
-                      {feature.description && (
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {feature.description}
-                        </p>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center bg-primary/5 border-x border-primary/10">
-                    <ValueCell value={feature.carlos} isCarlos />
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <ValueCell value={feature.inspectorio} />
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <ValueCell value={feature.tradebeyond} />
-                  </TableCell>
-                </TableRow>
+              {grouped.map((group) => (
+                <>
+                  {/* Category section header */}
+                  {category === "all" && (
+                    <TableRow key={`header-${group.category}`} className="bg-muted/50 hover:bg-muted/50">
+                      <TableCell colSpan={4} className="py-2.5 px-4">
+                        <span className="font-display font-bold text-sm text-foreground uppercase tracking-wide">
+                          {CATEGORY_LABELS[group.category]}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {group.features.map((feature, i) => (
+                    <TableRow
+                      key={feature.label}
+                      className={i % 2 === 1 ? "bg-muted/30" : ""}
+                    >
+                      <TableCell>
+                        <div>
+                          <span className="font-medium text-foreground">{feature.label}</span>
+                          {feature.description && (
+                            <p className="text-xs text-muted-foreground mt-0.5">{feature.description}</p>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center bg-primary/5 border-x border-primary/20">
+                        <CompareValueCell value={feature.carlos} caveat={feature.carlosCaveat} isCarlos />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <CompareValueCell value={feature.inspectorio} caveat={feature.inspectorioCaveat} />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <CompareValueCell value={feature.tradebeyond} caveat={feature.tradebeyondCaveat} />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </>
               ))}
             </TableBody>
+
+            <TableFooter>
+              <TableRow className="bg-primary/5 hover:bg-primary/5">
+                <TableCell className="font-display font-bold text-foreground">
+                  <div className="flex items-center gap-2">
+                    <Trophy className="h-4 w-4 text-primary" />
+                    Summary
+                  </div>
+                </TableCell>
+                <TableCell className="text-center bg-primary/10 border-x border-primary/20 font-display font-bold text-primary">
+                  Leads in {carlosWins} of {totalFeatures}
+                </TableCell>
+                <TableCell className="text-center text-muted-foreground text-sm">—</TableCell>
+                <TableCell className="text-center text-muted-foreground text-sm">—</TableCell>
+              </TableRow>
+            </TableFooter>
           </Table>
         </CardContent>
       </Card>
@@ -240,9 +163,7 @@ const ComparePage = () => {
         ].map((item) => (
           <Card key={item.stat} className="text-center py-6">
             <CardContent className="p-0 space-y-1">
-              <span className="text-3xl font-display font-bold text-primary">
-                {item.stat}
-              </span>
+              <span className="text-3xl font-display font-bold text-primary">{item.stat}</span>
               <p className="text-sm text-muted-foreground">{item.label}</p>
             </CardContent>
           </Card>
