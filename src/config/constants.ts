@@ -110,7 +110,13 @@ export const STORAGE_KEYS = {
   theme: "carlos_theme",
 } as const;
 
-const ALLOWED_DOMAINS = [".lovable.app", ".lovable.dev"];
+const ALLOWED_DOMAINS = ["lovable.app", "lovable.dev"];
+
+function isTrustedHostname(hostname: string): boolean {
+  return ALLOWED_DOMAINS.some(
+    (d) => hostname === d || hostname.endsWith(`.${d}`)
+  );
+}
 
 export function getAppUrl(appId: string): string {
   try {
@@ -124,8 +130,7 @@ export function getAppUrl(appId: string): string {
     }
     // Validate URL format and restrict to trusted domains
     const url = new URL(override);
-    const isTrusted = ALLOWED_DOMAINS.some((d) => url.hostname.endsWith(d));
-    if (!isTrusted || !["https:", "http:"].includes(url.protocol)) {
+    if (!isTrustedHostname(url.hostname) || !["https:", "http:"].includes(url.protocol)) {
       return APP_URLS[appId] || "";
     }
     return override;
