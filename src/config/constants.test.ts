@@ -29,6 +29,11 @@ describe("getAppUrl", () => {
     expect(getAppUrl("portal")).toBe(APP_URLS.portal);
   });
 
+  it("rejects domain that contains trusted suffix without dot boundary", () => {
+    localStorage.setItem(STORAGE_KEYS.appUrls, JSON.stringify({ portal: "https://evillovable.app" }));
+    expect(getAppUrl("portal")).toBe(APP_URLS.portal);
+  });
+
   it("rejects non-http protocols", () => {
     localStorage.setItem(STORAGE_KEYS.appUrls, JSON.stringify({ portal: "javascript:alert(1)" }));
     expect(getAppUrl("portal")).toBe(APP_URLS.portal);
